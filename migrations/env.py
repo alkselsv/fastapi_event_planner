@@ -1,3 +1,6 @@
+import sys
+sys.path.append('./src')
+
 import asyncio
 from logging.config import fileConfig
 
