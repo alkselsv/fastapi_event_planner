@@ -1,8 +1,8 @@
 """add users, events
 
-Revision ID: 156263d2db13
+Revision ID: dbb9b976c230
 Revises: 
-Create Date: 2024-08-25 12:41:39.015308
+Create Date: 2024-08-28 14:38:04.985522
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '156263d2db13'
+revision = 'dbb9b976c230'
 down_revision = None
 branch_labels = None
 depends_on = None
