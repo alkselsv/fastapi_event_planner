@@ -17,13 +17,13 @@ class SignInUser(BaseModel):
         }
 
 
+class SignUpUser(SignInUser):
+    pass
+
+
 class TokenResponse(BaseModel):
     access_token: str
     token_type: str
-
-
-class SignUpUser(SignInUser):
-    pass
 
 
 class User(Base):

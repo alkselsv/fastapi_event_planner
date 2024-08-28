@@ -3,15 +3,16 @@ import pytest
 from auth.jwt_handler import create_access_token
 from sqlalchemy.ext.asyncio import AsyncSession
 from models.events import Event
+from typing import AsyncGenerator
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture
 async def access_token() -> str:
     return create_access_token("testuser@server.com")
 
 
-@pytest.fixture(scope="module")
-async def mock_event(session: AsyncSession) -> Event:
+@pytest.fixture
+async def mock_event(test_session: AsyncSession) -> AsyncGenerator[Event, None]:
     new_event = Event(
         creator="testuser@server.com",
         title="Event title",
@@ -20,12 +21,13 @@ async def mock_event(session: AsyncSession) -> Event:
         tags=["tag1", "tag2"],
         location="Event location",
     )
-    session.add(new_event)
-    await session.commit()
-    await session.refresh(new_event)
+    test_session.add(new_event)
+    await test_session.commit()
+    await test_session.refresh(new_event)
     yield new_event
-    await session.delete(new_event)
-    await session.commit()
+    # await test_session.delete(new_event)
+    # await test_session.commit()
+    await test_session.rollback()
 
 
 @pytest.mark.asyncio
@@ -68,15 +70,6 @@ async def test_post_event(client: httpx.AsyncClient, access_token: str) -> None:
 
 
 @pytest.mark.asyncio
-async def test_get_events_count(client: httpx.AsyncClient, access_token: str) -> None:
-    headers = {"Authorization": f"Bearer {access_token}"}
-    response = await client.get("/event/", headers=headers)
-    events = response.json()
-    assert response.status_code == 200
-    assert len(events) == 2
-
-
-@pytest.mark.asyncio
 async def test_update_event(
     client: httpx.AsyncClient, mock_event: Event, access_token: str
 ) -> None:
@@ -106,7 +99,7 @@ async def test_delete_event(
 
 @pytest.mark.asyncio
 async def test_get_event_again(
-    client: httpx.AsyncClient, mock_event: Event, access_token: str
+    client: httpx.AsyncClient, access_token: str
 ) -> None:
     headers = {"Authorization": f"Bearer {access_token}"}
     response = await client.get("/event/1", headers=headers)

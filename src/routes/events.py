@@ -24,7 +24,7 @@ async def retrieve_event(
     id: int,
     user: str = Depends(authenticate),
     session: AsyncSession = Depends(get_session),
-) -> Event:
+) -> Event | dict:
     event = await session.get(Event, id)
     if event:
         return event
