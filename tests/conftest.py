@@ -3,9 +3,7 @@ from dotenv import load_dotenv
 import asyncio
 import pytest
 from httpx import AsyncClient, ASGITransport
-from contextlib import asynccontextmanager
-
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncEngine, AsyncSession
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncEngine
 from sqlalchemy.pool import NullPool
 
 from main import app
@@ -19,25 +17,20 @@ DATABASE_URL: str = os.getenv("DATABASE_URL_TEST")
 if not DATABASE_URL:
     raise ValueError("DATABASE_URL_TEST environment variable is not set")
 
-engine: AsyncEngine = create_async_engine(DATABASE_URL, poolclass=NullPool, echo=True)
 
-
-@asynccontextmanager
-async def override_get_session():
-    async with AsyncSession(engine) as session:
-        yield session
-
-
-async def init_db():
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.drop_all)
-        await conn.run_sync(Base.metadata.create_all)
+@pytest.fixture(scope="session")
+async def engine() -> AsyncEngine:
+    yield create_async_engine(DATABASE_URL, poolclass=NullPool, echo=True)
 
 
 @pytest.fixture(scope="session", autouse=True)
-async def initialize_database():
-    await init_db()
+async def initialize_database(engine):
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.drop_all)
+        await conn.run_sync(Base.metadata.create_all)
     yield
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.drop_all)
 
 
 @pytest.fixture(scope="function")
@@ -49,7 +42,7 @@ def event_loop():
 
 
 @pytest.fixture(scope="function")
-async def test_session():
+async def test_session(engine):
     session_maker.configure(bind=engine)
     async with session_maker() as session:
         try:

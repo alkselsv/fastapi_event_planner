@@ -20,7 +20,7 @@ async def test_sign_new_user(client: httpx.AsyncClient) -> None:
 
 
 async def test_sign_user_in(client: httpx.AsyncClient) -> None:
-    
+
     payload = {"username": "testuser@server.com", "password": "testpassword"}
 
     headers = {
