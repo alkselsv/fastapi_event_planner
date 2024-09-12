@@ -29,7 +29,6 @@ async def mock_event(test_session: AsyncSession) -> AsyncGenerator[Event, None]:
     await test_session.rollback()
 
 
-@pytest.mark.asyncio
 async def test_get_events(
     client: httpx.AsyncClient, mock_event: Event, access_token: str
 ) -> None:
@@ -39,7 +38,6 @@ async def test_get_events(
     assert response.json()[0]["title"] == mock_event.title
 
 
-@pytest.mark.asyncio
 async def test_get_event(
     client: httpx.AsyncClient, mock_event: Event, access_token: str
 ) -> None:
@@ -49,7 +47,6 @@ async def test_get_event(
     assert response.json()["title"] == mock_event.title
 
 
-@pytest.mark.asyncio
 async def test_post_event(client: httpx.AsyncClient, access_token: str) -> None:
     payload = {
         "title": "Event title",
@@ -68,7 +65,6 @@ async def test_post_event(client: httpx.AsyncClient, access_token: str) -> None:
     assert response.json() == test_response
 
 
-@pytest.mark.asyncio
 async def test_update_event(
     client: httpx.AsyncClient, mock_event: Event, access_token: str
 ) -> None:
@@ -82,7 +78,6 @@ async def test_update_event(
     assert response.json()["title"] == test_payload["title"]
 
 
-@pytest.mark.asyncio
 async def test_delete_event(
     client: httpx.AsyncClient, mock_event: Event, access_token: str
 ) -> None:
@@ -96,7 +91,6 @@ async def test_delete_event(
     assert response.json() == test_response
 
 
-@pytest.mark.asyncio
 async def test_get_event_again(
     client: httpx.AsyncClient, access_token: str
 ) -> None:

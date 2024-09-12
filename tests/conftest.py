@@ -1,7 +1,7 @@
 import os
 from dotenv import load_dotenv
 import asyncio
-import pytest_asyncio
+import pytest
 from httpx import AsyncClient, ASGITransport
 from contextlib import asynccontextmanager
 
@@ -34,13 +34,13 @@ async def init_db():
         await conn.run_sync(Base.metadata.create_all)
 
 
-@pytest_asyncio.fixture(scope="session", autouse=True)
+@pytest.fixture(scope="session", autouse=True)
 async def initialize_database():
     await init_db()
     yield
 
 
-@pytest_asyncio.fixture(scope="function")
+@pytest.fixture(scope="function")
 def event_loop():
     policy = asyncio.get_event_loop_policy()
     loop = policy.new_event_loop()
@@ -48,7 +48,7 @@ def event_loop():
     loop.close()
 
 
-@pytest_asyncio.fixture(scope="function")
+@pytest.fixture(scope="function")
 async def test_session():
     session_maker.configure(bind=engine)
     async with session_maker() as session:
@@ -58,7 +58,7 @@ async def test_session():
             await session.close()
 
 
-@pytest_asyncio.fixture(scope="function")
+@pytest.fixture(scope="function")
 async def client(test_session):
     app.dependency_overrides[get_session] = lambda: test_session
     async with AsyncClient(
