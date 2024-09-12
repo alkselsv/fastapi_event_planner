@@ -4,6 +4,7 @@ from auth.jwt_handler import create_access_token
 from sqlalchemy.ext.asyncio import AsyncSession
 from models.events import Event
 from typing import AsyncGenerator
+from datetime import datetime
 
 
 @pytest.fixture
@@ -16,7 +17,7 @@ async def mock_event(test_session: AsyncSession) -> AsyncGenerator[Event, None]:
     new_event = Event(
         creator="testuser@server.com",
         title="Event title",
-        image="https://link-to-image.com/image.png",
+        date=datetime(2024, 8, 28, 14, 38, 4),
         description="Event description",
         tags=["tag1", "tag2"],
         location="Event location",
@@ -25,8 +26,6 @@ async def mock_event(test_session: AsyncSession) -> AsyncGenerator[Event, None]:
     await test_session.commit()
     await test_session.refresh(new_event)
     yield new_event
-    # await test_session.delete(new_event)
-    # await test_session.commit()
     await test_session.rollback()
 
 
@@ -54,7 +53,7 @@ async def test_get_event(
 async def test_post_event(client: httpx.AsyncClient, access_token: str) -> None:
     payload = {
         "title": "Event title",
-        "image": "https://link-to-image.com/image.png",
+        "date": "2024-08-28T14:38:04",
         "description": "Event description",
         "tags": ["tag1", "tag2"],
         "location": "Event location",

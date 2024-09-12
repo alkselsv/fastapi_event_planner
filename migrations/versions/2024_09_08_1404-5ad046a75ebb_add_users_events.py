@@ -1,8 +1,8 @@
 """add users, events
 
-Revision ID: dbb9b976c230
+Revision ID: 5ad046a75ebb
 Revises: 
-Create Date: 2024-08-28 14:38:04.985522
+Create Date: 2024-09-08 14:04:30.156338
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'dbb9b976c230'
+revision = '5ad046a75ebb'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -22,7 +22,7 @@ def upgrade() -> None:
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('creator', sa.String(length=32), nullable=False),
     sa.Column('title', sa.String(length=64), nullable=False),
-    sa.Column('image', sa.String(length=256), nullable=False),
+    sa.Column('date', sa.DateTime(), nullable=False),
     sa.Column('description', sa.String(length=256), nullable=False),
     sa.Column('tags', sa.ARRAY(sa.String(length=16)), nullable=False),
     sa.Column('location', sa.String(length=64), nullable=False),

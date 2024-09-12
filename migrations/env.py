@@ -5,7 +5,7 @@ sys.path.append("./src")
 import asyncio
 from logging.config import fileConfig
 
-from sqlalchemy import pool, MetaData
+from sqlalchemy import pool
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
@@ -25,8 +25,8 @@ if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
 # Combine metadata from all models
-target_metadata = MetaData()
-target_metadata.combine(User.metadata, Event.metadata)
+target_metadata = Event.metadata
+target_metadata = User.metadata
 
 config.set_main_option(
     "sqlalchemy.url", engine.url.render_as_string(hide_password=False)
