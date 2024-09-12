@@ -3,12 +3,12 @@ from dotenv import load_dotenv
 import asyncio
 import pytest
 from httpx import AsyncClient, ASGITransport
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncEngine
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncEngine, async_sessionmaker, AsyncSession
 from sqlalchemy.pool import NullPool
 
 from main import app
 from database.base import Base
-from database.connection import get_session, session_maker
+from database.connection import get_session
 
 load_dotenv()
 
@@ -43,7 +43,7 @@ def event_loop():
 
 @pytest.fixture(scope="function")
 async def test_session(engine):
-    session_maker.configure(bind=engine)
+    session_maker = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
     async with session_maker() as session:
         try:
             yield session
