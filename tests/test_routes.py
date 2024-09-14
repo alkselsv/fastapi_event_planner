@@ -1,6 +1,6 @@
 import httpx
 import pytest
-from auth.jwt_handler import create_access_token
+from auth.jwt_handler import JwtTokenHandler
 from sqlalchemy.ext.asyncio import AsyncSession
 from models.events import Event
 from typing import AsyncGenerator
@@ -9,7 +9,7 @@ from datetime import datetime
 
 @pytest.fixture
 async def access_token() -> str:
-    return create_access_token("testuser@server.com")
+    return JwtTokenHandler.create_access_token("testuser@server.com")
 
 
 @pytest.fixture

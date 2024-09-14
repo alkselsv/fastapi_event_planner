@@ -1,4 +1,9 @@
+from unittest.mock import Mock
+
 import httpx
+
+from auth.jwt_handler import JwtTokenHandler
+from main import app
 
 
 async def test_sign_new_user(client: httpx.AsyncClient) -> None:
@@ -27,6 +32,13 @@ async def test_sign_user_in(client: httpx.AsyncClient) -> None:
         "Content-Type": "application/x-www-form-urlencoded",
     }
 
+    app.dependency_overrides[JwtTokenHandler] = lambda: Mock(
+        create_access_token=Mock(return_value="token"),
+    )
+
     response = await client.post("/user/signin", data=payload, headers=headers)
     assert response.status_code == 200
-    assert response.json()["token_type"] == "Bearer"
+    assert response.json() == {
+        "token_type": "Bearer",
+        "access_token": "token",
+    }
