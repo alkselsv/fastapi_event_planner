@@ -39,7 +39,6 @@ async def sign_user_up(
 async def sign_user_in(
     data: OAuth2PasswordRequestForm = Depends(),
     session: AsyncSession = Depends(get_session),
-    token_handler: JwtTokenHandler = Depends(JwtTokenHandler)
 ) -> TokenResponse | dict:
     statement = select(User).where(User.email == data.username)
     result = await session.execute(statement)
@@ -54,5 +53,5 @@ async def sign_user_in(
             status_code=status.HTTP_403_FORBIDDEN, detail="Wrong credential passed"
         )
 
-    access_token = token_handler.create_access_token(data.username)
+    access_token = JwtTokenHandler.create_access_token(data.username)
     return TokenResponse(access_token=access_token, token_type="Bearer")
