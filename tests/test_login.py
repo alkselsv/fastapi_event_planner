@@ -1,8 +1,6 @@
-import pytest
 import httpx
 
 
-@pytest.mark.asyncio
 async def test_sign_new_user(client: httpx.AsyncClient) -> None:
 
     payload = {
@@ -20,9 +18,8 @@ async def test_sign_new_user(client: httpx.AsyncClient) -> None:
     assert response.json() == test_response
 
 
-@pytest.mark.asyncio
 async def test_sign_user_in(client: httpx.AsyncClient) -> None:
-    
+
     payload = {"username": "testuser@server.com", "password": "testpassword"}
 
     headers = {
