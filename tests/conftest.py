@@ -32,30 +32,17 @@ async def initialize_database(engine):
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
 
-
-@pytest.fixture(scope="function")
-def event_loop():
-    policy = asyncio.get_event_loop_policy()
-    loop = policy.new_event_loop()
-    yield loop
-    loop.close()
-
-
-@pytest.fixture(scope="function")
+@pytest.fixture
 async def test_session(engine):
-    session_maker = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
-    async with session_maker() as session:
-        try:
-            yield session
-        finally:
-            await session.close()
+    connection = await engine.connect()
+    trans = await connection.begin()
 
+    sessionmaker = async_sessionmaker(connection, expire_on_commit=False, class_=AsyncSession)
+    session = sessionmaker()
 
-@pytest.fixture(scope="function")
-async def client(test_session):
-    app.dependency_overrides[get_session] = lambda: test_session
-    async with AsyncClient(
-        transport=ASGITransport(app), base_url="http://localhost"
-    ) as client:
-        yield client
-    app.dependency_overrides.clear()
+    try:
+        yield session
+    finally:
+        await session.close()
+        await trans.rollback()
+        await connection.close(
