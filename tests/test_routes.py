@@ -121,5 +121,10 @@ async def test_delete_event(
     response = await client.delete(f"/event/delete/{mock_event.id}", headers=headers)
     assert response.status_code == 200
     assert response.json() == test_response
-
     assert (await test_session.execute(select(Event))).all() == []
+
+    
+async def test_get_event_again(client: httpx.AsyncClient, access_token: str) -> None:
+    headers = {"Authorization": f"Bearer {access_token}"}
+    response = await client.get("/event/1", headers=headers)
+    assert response.status_code == 404

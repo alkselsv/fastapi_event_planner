@@ -32,7 +32,6 @@ async def initialize_database(engine):
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
 
-
 @pytest.fixture
 async def test_session(engine):
     connection = await engine.connect()
@@ -46,14 +45,4 @@ async def test_session(engine):
     finally:
         await session.close()
         await trans.rollback()
-        await connection.close()
-
-
-@pytest.fixture
-async def client(test_session):
-    app.dependency_overrides[get_session] = lambda: test_session
-    async with AsyncClient(
-        transport=ASGITransport(app), base_url="http://localhost"
-    ) as client:
-        yield client
-    app.dependency_overrides.clear()
+        await connection.close(

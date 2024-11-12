@@ -1,5 +1,4 @@
 from unittest.mock import patch
-
 import httpx
 from sqlalchemy.ext.asyncio import AsyncSession
 
