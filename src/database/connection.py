@@ -18,6 +18,7 @@ if not DATABASE_URL:
     raise ValueError("DATABASE_URL_PROD environment variable is not set")
 
 engine: AsyncEngine = create_async_engine(DATABASE_URL, echo=True)
+
 session_maker = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 
 
